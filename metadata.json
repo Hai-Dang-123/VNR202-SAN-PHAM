@@ -1,0 +1,7 @@
+{
+  "name": "Vietnam's Path to Global Integration – The Living Book",
+  "description": "An interactive 3D AR web experience built with MindAR.js and A-Frame. Scan a trigger image to explore a 3D book detailing Vietnam's historical phases of political and diplomatic transformation, complete with animations, narration, and an interactive quiz.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
