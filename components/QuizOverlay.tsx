@@ -1,6 +1,11 @@
 
 import React, { useState } from 'react';
 
+import arframe from '../aframe'; // Ensure custom components are registered
+
+
+
+
 interface QuizOverlayProps {
     onClose: () => void;
     onAnswer: (isCorrect: boolean) => void;

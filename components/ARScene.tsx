@@ -1,5 +1,9 @@
 
 import React, { useEffect, useRef } from 'react';
+import arframe from '../aframe'; // Ensure custom components are registered
+
+
+
 
 interface ARSceneProps {
     currentPage: number;
@@ -13,27 +17,55 @@ interface ARSceneProps {
 const ARScene: React.FC<ARSceneProps> = ({ currentPage, isQuizVisible, onPageFlip, onShowQuiz, onSceneReady, onArError }) => {
     const sceneRef = useRef<any>(null);
 
-    useEffect(() => {
-        const sceneEl = sceneRef.current;
-        if (sceneEl) {
-            const handlePageFlip = (e: any) => onPageFlip(e.detail.direction);
+    // useEffect(() => {
+    //     const sceneEl = sceneRef.current;
+    //     if (sceneEl) {
+    //         const handlePageFlip = (e: any) => onPageFlip(e.detail.direction);
             
-            sceneEl.addEventListener('arReady', onSceneReady);
-            sceneEl.addEventListener('arError', onArError);
-            sceneEl.addEventListener('page-flip', handlePageFlip);
-            sceneEl.addEventListener('show-quiz', onShowQuiz);
+    //         sceneEl.addEventListener('arReady', onSceneReady);
+    //         sceneEl.addEventListener('arError', onArError);
+    //         sceneEl.addEventListener('page-flip', handlePageFlip);
+    //         sceneEl.addEventListener('show-quiz', onShowQuiz);
 
-            return () => {
-                sceneEl.removeEventListener('arReady', onSceneReady);
-                sceneEl.removeEventListener('arError', onArError);
-                sceneEl.removeEventListener('page-flip', handlePageFlip);
-                sceneEl.removeEventListener('show-quiz', onShowQuiz);
-            };
-        }
-    }, [onArError, onPageFlip, onSceneReady, onShowQuiz]);
+    //         return () => {
+    //             sceneEl.removeEventListener('arReady', onSceneReady);
+    //             sceneEl.removeEventListener('arError', onArError);
+    //             sceneEl.removeEventListener('page-flip', handlePageFlip);
+    //             sceneEl.removeEventListener('show-quiz', onShowQuiz);
+    //         };
+    //     }
+    // }, [onArError, onPageFlip, onSceneReady, onShowQuiz]);
+
+    useEffect(() => {
+    const sceneEl = sceneRef.current;
+    if (!sceneEl) return;
+
+    const bindEvents = () => {
+        sceneEl.addEventListener('arReady', onSceneReady);
+        sceneEl.addEventListener('arError', onArError);
+        sceneEl.addEventListener('page-flip', (e: any) => onPageFlip(e.detail.direction));
+        sceneEl.addEventListener('show-quiz', onShowQuiz);
+    };
+
+    if (sceneEl.hasLoaded) {
+        bindEvents();
+    } else {
+        sceneEl.addEventListener('loaded', bindEvents);
+    }
+
+    return () => {
+        sceneEl.removeEventListener('loaded', bindEvents);
+        sceneEl.removeEventListener('arReady', onSceneReady);
+        sceneEl.removeEventListener('arError', onArError);
+        sceneEl.removeEventListener('page-flip', (e: any) => onPageFlip(e.detail.direction));
+        sceneEl.removeEventListener('show-quiz', onShowQuiz);
+    };
+}, [onArError, onPageFlip, onSceneReady, onShowQuiz]);
+
 
     return (
         <a-scene
+
             ref={sceneRef}
             mindar-image="imageTargetSrc: /assets/targets.mind; autoStart: true; uiScanning: no; maxTrack: 1;"
             color-space="sRGB"

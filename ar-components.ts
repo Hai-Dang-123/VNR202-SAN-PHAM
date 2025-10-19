@@ -1,5 +1,35 @@
 // Fix: Removed `declare const AFRAME: any;` to prevent a redeclaration error.
 // The global AFRAME object is now declared in `aframe.d.ts`.
+// aframe.ts
+// Ensure this file is a module
+export {};
+
+// Make AFRAME global
+declare global {
+  var AFRAME: any;
+}
+
+// Wait until AFRAME is loaded
+if (typeof window !== 'undefined') {
+  if (!window.AFRAME) {
+    console.error('AFRAME is not loaded!');
+  } else {
+    const AFRAME = window.AFRAME;
+
+    // Polyfill for THREE.Math.generateUUID if missing
+    if (!AFRAME.THREE?.Math?.generateUUID) {
+      if (AFRAME.THREE?.Math) {
+        AFRAME.THREE.Math.generateUUID = function () {
+          // Simple UUID generator
+          return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+            const r = (Math.random() * 16) | 0;
+            const v = c === 'x' ? r : (r & 0x3) | 0x8;
+            return v.toString(16);
+          });
+        };
+        console.log('THREE.Math.generateUUID polyfilled');
+      }
+    }
 
 // Component to handle swipe gestures for page flipping
 AFRAME.registerComponent('page-flipper', {
@@ -71,3 +101,5 @@ AFRAME.registerComponent('quiz-button', {
         });
     }
 });
+    }
+}
